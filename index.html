@@ -1,0 +1,499 @@
+from pathlib import Path
+
+src_path = Path("/mnt/data/Pasted text(1).txt")
+original = src_path.read_text(encoding="utf-8")
+
+html = original
+
+# 1) Add login CSS before </style>
+login_css = r'''
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #dbeafe, #f8fafc);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 460px;
+      background: white;
+      border-radius: 24px;
+      padding: 28px;
+      text-align: center;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+      border: 1px solid var(--border);
+    }
+
+    .login-card h1 {
+      color: var(--primary-dark);
+      margin-top: 0;
+      font-size: 28px;
+    }
+
+    .login-card p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .login-help {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .user-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      padding: 12px 16px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .user-info-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: #dbeafe;
+      object-fit: cover;
+      border: 1px solid #bfdbfe;
+    }
+
+    .sync-status {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .btn-google {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-google:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .firebase-warning {
+      display: none;
+      margin-bottom: 20px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+      padding: 14px;
+      border-radius: 16px;
+      line-height: 1.45;
+    }
+'''
+html = html.replace("  </style>", login_css + "\n  </style>")
+
+# 2) Replace body opening app
+old = '<body>\n  <div class="app">'
+new = '''<body>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <h1>🧳 Organizador de Mudanza</h1>
+      <p>
+        Ingresá con Google para guardar tu checklist, inventario y notas de mudanza en la nube.
+      </p>
+
+      <button class="btn-google" onclick="loginWithGoogle()">
+        🔐 Ingresar con Google
+      </button>
+
+      <div class="login-help">
+        Si el botón no funciona, revisá que hayas pegado tu configuración de Firebase,
+        habilitado Google Sign-In y autorizado el dominio de GitHub Pages.
+      </div>
+    </div>
+  </div>
+
+  <div class="app" id="app" style="display:none;">
+    <div id="firebaseWarning" class="firebase-warning">
+      <strong>Falta configurar Firebase.</strong><br>
+      Abrí el archivo <strong>index.html</strong> y reemplazá los valores que dicen
+      <strong>PEGAR_...</strong> por los datos reales de tu proyecto Firebase.
+    </div>
+
+    <div class="user-bar">
+      <div class="user-info-wrap">
+        <img id="userAvatar" class="user-avatar" alt="Usuario" />
+        <div>
+          <div>Usuario: <strong id="userInfo">-</strong></div>
+          <div class="sync-status" id="syncStatus">Sincronización pendiente</div>
+        </div>
+      </div>
+
+      <button class="btn-secondary" onclick="logoutGoogle()">Cerrar sesión</button>
+    </div>'''
+html = html.replace(old, new)
+
+# 3) Replace script start with module imports
+old_script_start = '''  <script>
+    let tasks = [];
+    let inventory = [];
+    let currentFilter = "todas";'''
+
+new_script_start = '''  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    /*
+      ==========================================================
+      CONFIGURACIÓN FIREBASE
+      ==========================================================
+
+      1) Entrá a Firebase Console.
+      2) Proyecto → Configuración del proyecto → General.
+      3) Agregá una app web.
+      4) Copiá el firebaseConfig y reemplazá estos valores.
+
+      También tenés que:
+      - Habilitar Authentication → Sign-in method → Google.
+      - Crear Firestore Database.
+      - Agregar tu dominio de GitHub Pages en:
+        Authentication → Settings → Authorized domains.
+
+      Ejemplo de dominio:
+      tuusuario.github.io
+    */
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAVqJB2qipLZxlWy76qldWCouqJQHlBU1w",
+      authDomain: "reloready-3d268.firebaseapp.com",
+      projectId: "reloready-3d268",
+      storageBucket: "reloready-3d268.firebasestorage.app",
+      messagingSenderId: "320535839013",
+      appId: "1:320535839013:web:e726d6e2f55dec0c66dacc"
+    };
+
+    const firebaseReady =
+      firebaseConfig.apiKey &&
+      !firebaseConfig.apiKey.startsWith("PEGAR_") &&
+      firebaseConfig.projectId &&
+      !firebaseConfig.projectId.startsWith("PEGAR_");
+
+    const firebaseApp = initializeApp(firebaseConfig);
+    const auth = getAuth(firebaseApp);
+    const db = getFirestore(firebaseApp);
+    const provider = new GoogleAuthProvider();
+
+    let currentUser = null;
+    let tasks = [];
+    let inventory = [];
+    let currentFilter = "todas";
+    let saveTimer = null;'''
+html = html.replace(old_script_start, new_script_start)
+
+# 4) Replace loadData and save functions block manually
+old_block = '''    function loadData() {
+      const savedTasks = localStorage.getItem("mudanzaTasks");
+      const savedNotes = localStorage.getItem("mudanzaNotes");
+      const savedInventory = localStorage.getItem("mudanzaInventory");
+
+      if (savedTasks) {
+        tasks = JSON.parse(savedTasks);
+      } else {
+        tasks = defaultTasks.map((task, index) => ({
+          id: Date.now() + index,
+          ...task
+        }));
+        saveTasks();
+      }
+
+      if (savedInventory) {
+        inventory = JSON.parse(savedInventory);
+      }
+
+      if (savedNotes) {
+        document.getElementById("notes").value = savedNotes;
+      }
+
+      renderTasks();
+      renderInventory();
+      updateStats();
+    }
+
+    function saveTasks() {
+      localStorage.setItem("mudanzaTasks", JSON.stringify(tasks));
+    }
+
+    function saveInventory() {
+      localStorage.setItem("mudanzaInventory", JSON.stringify(inventory));
+    }
+
+    function saveNotes() {
+      const notes = document.getElementById("notes").value;
+      localStorage.setItem("mudanzaNotes", notes);
+      alert("Notas guardadas.");
+    }'''
+
+new_block = '''    function getUserProgressRef() {
+      return doc(db, "users", currentUser.uid, "mudanza", "progreso");
+    }
+
+    function setSyncStatus(text) {
+      const el = document.getElementById("syncStatus");
+      if (el) el.textContent = text;
+    }
+
+    async function loadCloudData() {
+      if (!currentUser) return;
+
+      setSyncStatus("Cargando progreso...");
+
+      try {
+        const snap = await getDoc(getUserProgressRef());
+
+        if (snap.exists()) {
+          const data = snap.data();
+
+          tasks = Array.isArray(data.tasks) ? data.tasks : [];
+          inventory = Array.isArray(data.inventory) ? data.inventory : [];
+
+          const notesBox = document.getElementById("notes");
+          if (notesBox) notesBox.value = data.notes || "";
+
+          if (tasks.length === 0) {
+            tasks = defaultTasks.map((task, index) => ({
+              id: Date.now() + index,
+              ...task
+            }));
+            await saveCloudData();
+          }
+        } else {
+          tasks = defaultTasks.map((task, index) => ({
+            id: Date.now() + index,
+            ...task
+          }));
+          inventory = [];
+
+          const notesBox = document.getElementById("notes");
+          if (notesBox) notesBox.value = "";
+
+          await saveCloudData();
+        }
+
+        setSyncStatus("Progreso cargado y sincronizado");
+      } catch (error) {
+        console.error("Error cargando datos desde Firestore:", error);
+        setSyncStatus("Error al cargar datos");
+
+        alert(
+          "No se pudo cargar el progreso desde Firebase. Revisá las reglas de Firestore y la configuración del proyecto."
+        );
+      }
+    }
+
+    async function saveCloudData() {
+      if (!currentUser) return;
+
+      const notes = document.getElementById("notes")?.value || "";
+
+      try {
+        setSyncStatus("Guardando...");
+
+        await setDoc(getUserProgressRef(), {
+          tasks,
+          inventory,
+          notes,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        setSyncStatus("Guardado en la nube");
+      } catch (error) {
+        console.error("Error guardando datos en Firestore:", error);
+        setSyncStatus("Error al guardar");
+
+        alert(
+          "No se pudo guardar en Firebase. Revisá las reglas de Firestore y la conexión."
+        );
+      }
+    }
+
+    function scheduleSaveCloudData() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        saveCloudData();
+      }, 500);
+    }
+
+    function saveNotes() {
+      saveCloudData();
+      alert("Notas guardadas en tu cuenta.");
+    }
+
+    window.loginWithGoogle = async function () {
+      if (!firebaseReady) {
+        document.getElementById("firebaseWarning").style.display = "block";
+        alert("Primero tenés que pegar tu configuración de Firebase en el archivo index.html.");
+        return;
+      }
+
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        console.error("Error al iniciar sesión:", error);
+
+        if (error.code === "auth/operation-not-allowed") {
+          alert("Tenés que habilitar Google Sign-In en Firebase Authentication.");
+          return;
+        }
+
+        if (error.code === "auth/unauthorized-domain") {
+          alert("El dominio no está autorizado. Agregá tu dominio de GitHub Pages en Firebase Authentication → Settings → Authorized domains.");
+          return;
+        }
+
+        if (error.code === "auth/popup-blocked") {
+          alert("El navegador bloqueó la ventana de Google. Permití popups para este sitio.");
+          return;
+        }
+
+        alert("No se pudo iniciar sesión con Google.");
+      }
+    };
+
+    window.logoutGoogle = async function () {
+      await signOut(auth);
+    };
+
+    onAuthStateChanged(auth, async function (user) {
+      const loginScreen = document.getElementById("loginScreen");
+      const app = document.getElementById("app");
+      const userInfo = document.getElementById("userInfo");
+      const userAvatar = document.getElementById("userAvatar");
+      const firebaseWarning = document.getElementById("firebaseWarning");
+
+      if (!firebaseReady) {
+        loginScreen.style.display = "none";
+        app.style.display = "block";
+        firebaseWarning.style.display = "block";
+        setSyncStatus("Firebase no configurado");
+        tasks = defaultTasks.map((task, index) => ({
+          id: Date.now() + index,
+          ...task
+        }));
+        inventory = [];
+        renderTasks();
+        renderInventory();
+        updateStats();
+        return;
+      }
+
+      if (user) {
+        currentUser = user;
+
+        loginScreen.style.display = "none";
+        app.style.display = "block";
+        firebaseWarning.style.display = "none";
+
+        userInfo.textContent = user.displayName || user.email || "Usuario";
+        userAvatar.src = user.photoURL || "";
+        userAvatar.style.display = user.photoURL ? "block" : "none";
+
+        await loadCloudData();
+        renderTasks();
+        renderInventory();
+        updateStats();
+      } else {
+        currentUser = null;
+
+        loginScreen.style.display = "grid";
+        app.style.display = "none";
+      }
+    });'''
+html = html.replace(old_block, new_block)
+
+# 5) Replace save calls
+html = html.replace("      saveTasks();", "      scheduleSaveCloudData();")
+html = html.replace("      saveInventory();", "      scheduleSaveCloudData();")
+
+# Some initial save in loadCloudData was in new block saveCloudData not schedule now OK? We already replaced inside new block? Let's inspect fix if saveCloudData got replaced accidentally:
+html = html.replace("await scheduleSaveCloudData();", "await saveCloudData();")
+
+# 6) localStorage remove in resetAll/resetInventory should not be necessary but original has removals. Remove them.
+html = html.replace('      localStorage.removeItem("mudanzaTasks");\n      localStorage.removeItem("mudanzaNotes");\n      localStorage.removeItem("mudanzaInventory");\n\n', '')
+
+# 7) notes input event localStorage -> scheduleSave
+old_notes_listener = '''    document.getElementById("notes").addEventListener("input", function() {
+      localStorage.setItem("mudanzaNotes", this.value);
+    });
+
+    loadData();'''
+new_notes_listener = '''    document.getElementById("notes").addEventListener("input", function() {
+      scheduleSaveCloudData();
+    });
+
+    /*
+      Como este script es type="module", las funciones llamadas desde onclick=""
+      deben exponerse en window.
+    */
+    window.openTab = openTab;
+    window.addTask = addTask;
+    window.toggleTask = toggleTask;
+    window.deleteTask = deleteTask;
+    window.setFilter = setFilter;
+    window.suggestToday = suggestToday;
+    window.loadPreset = loadPreset;
+    window.clearObjectForm = clearObjectForm;
+    window.addObject = addObject;
+    window.deleteObject = deleteObject;
+    window.downloadInventoryCSV = downloadInventoryCSV;
+    window.copyInventorySummary = copyInventorySummary;
+    window.shareInventoryWhatsApp = shareInventoryWhatsApp;
+    window.saveNotes = saveNotes;
+    window.copyFullSummary = copyFullSummary;
+    window.shareFullWhatsApp = shareFullWhatsApp;
+    window.resetInventory = resetInventory;
+    window.resetAll = resetAll;'''
+html = html.replace(old_notes_listener, new_notes_listener)
+
+# 8) Save might occur on resetAll and resetInventory with schedule not immediate. Good.
+# But saveCloudData should happen immediately on destructive reset? schedule okay, but maybe alert not. fine.
+
+# 9) Need openTab exposed before onclick? module loaded after HTML, okay.
+
+# write file
+out_path = Path("/mnt/data/index_organizador_mudanza_firebase.html")
+out_path.write_text(html, encoding="utf-8")
+out_path.as_posix()
