@@ -22,6 +22,7 @@
       --soft-yellow: #fef3c7;
       --soft-red: #fee2e2;
       --soft-purple: #ede9fe;
+      --soft-orange: #ffedd5;
     }
 
     * {
@@ -210,7 +211,7 @@
 
     .dashboard {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 16px;
       margin-bottom: 20px;
     }
@@ -311,12 +312,18 @@
 
     .form-grid {
       display: grid;
-      grid-template-columns: 1fr 170px 150px;
+      grid-template-columns: 1fr 170px 150px 160px;
       gap: 10px;
       margin-bottom: 12px;
     }
 
-    @media (max-width: 750px) {
+    @media (max-width: 900px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
       .form-grid {
         grid-template-columns: 1fr;
       }
@@ -337,6 +344,25 @@
 
     @media (max-width: 550px) {
       .object-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .box-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 150px 150px;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 800px) {
+      .box-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 550px) {
+      .box-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -416,6 +442,7 @@
       border-radius: 999px;
       font-size: 12px;
       font-weight: bold;
+      display: inline-block;
     }
 
     .alta {
@@ -431,6 +458,31 @@
     .baja {
       background: var(--soft-green);
       color: var(--green);
+    }
+
+    .tag-vencida {
+      background: var(--soft-red);
+      color: var(--red);
+    }
+
+    .tag-hoy {
+      background: var(--soft-orange);
+      color: #c2410c;
+    }
+
+    .tag-pronto {
+      background: var(--soft-yellow);
+      color: #92400e;
+    }
+
+    .tag-ok {
+      background: var(--soft-green);
+      color: var(--green);
+    }
+
+    .tag-sin-fecha {
+      background: #f3f4f6;
+      color: var(--muted);
     }
 
     .delete-btn {
@@ -481,6 +533,22 @@
       border-radius: 16px;
       line-height: 1.45;
       margin-bottom: 12px;
+    }
+
+    .alert-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      padding: 14px;
+      border-radius: 16px;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .alert-box.ok {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      color: #166534;
     }
 
     .small {
@@ -571,6 +639,65 @@
       font-size: 12px;
       font-weight: bold;
     }
+
+    .box-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .box-card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      background: #fff;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.04);
+    }
+
+    .box-card h3 {
+      margin: 0 0 8px;
+      color: var(--primary-dark);
+    }
+
+    .box-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .box-content {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    .print-label {
+      border: 2px solid #111827;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      page-break-inside: avoid;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .print-label h2 {
+      color: #111827;
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 
@@ -578,7 +705,7 @@
   <div id="loginScreen" class="login-screen">
     <div class="login-card">
       <h1>🧳 ReloReady</h1>
-      <p>Ingresá con Google para guardar tu checklist, inventario y notas de mudanza en la nube.</p>
+      <p>Ingresá con Google para guardar tu checklist, inventario, cajas y notas de mudanza en la nube.</p>
 
       <button class="btn-primary" id="loginBtn" type="button">
         🔐 Ingresar con Google
@@ -606,7 +733,7 @@
     <header>
       <h1>🧳 ReloReady - Organizador de Mudanza</h1>
       <p>
-        Herramienta para organizar una mudanza paso a paso, evitar olvidos, calcular volumen aproximado de muebles y generar un listado descargable para enviar a la empresa de mudanza.
+        Herramienta para organizar una mudanza paso a paso, evitar olvidos, calcular volumen aproximado, registrar cajas y generar etiquetas imprimibles.
       </p>
     </header>
 
@@ -622,8 +749,18 @@
       </div>
 
       <div class="stat-card">
+        <span>Tareas vencidas</span>
+        <strong id="overdueTasks">0</strong>
+      </div>
+
+      <div class="stat-card">
         <span>Objetos cargados</span>
         <strong id="totalObjects">0</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Cajas cargadas</span>
+        <strong id="totalBoxes">0</strong>
       </div>
 
       <div class="stat-card">
@@ -642,7 +779,8 @@
 
     <div class="tabs">
       <button class="active" data-tab="tabChecklist">✅ Checklist</button>
-      <button data-tab="tabInventory">📦 Inventario para mudanza</button>
+      <button data-tab="tabInventory">📦 Inventario</button>
+      <button data-tab="tabBoxes">🏷️ Cajas y etiquetas</button>
       <button data-tab="tabNotes">📝 Notas y resumen</button>
     </div>
 
@@ -653,7 +791,7 @@
             <h2>➕ Agregar tarea rápida</h2>
 
             <div class="form-grid">
-              <input id="taskInput" type="text" placeholder="Ej: separar ropa de invierno" />
+              <input id="taskInput" type="text" placeholder="Ej: confirmar horario del flete" />
 
               <select id="categoryInput">
                 <option value="Antes de mudarse">Antes de mudarse</option>
@@ -669,13 +807,22 @@
                 <option value="media" selected>Media</option>
                 <option value="baja">Baja</option>
               </select>
+
+              <input id="dueDateInput" type="date" />
             </div>
 
             <button class="btn-primary" id="addTaskBtn" type="button">Agregar tarea</button>
 
             <p class="small">
-              Para TDAH conviene cargar tareas chicas y concretas: “rotular caja baño”, “guardar DNI”, “desenchufar heladera”, etc.
+              La fecha límite es opcional. Si la completás, ReloReady te avisará si la tarea está vencida o próxima a vencer.
             </p>
+          </section>
+
+          <section class="card">
+            <h2>🚨 Alertas</h2>
+            <div id="deadlineAlerts" class="alert-box ok">
+              No hay alertas pendientes.
+            </div>
           </section>
 
           <section class="card">
@@ -685,6 +832,8 @@
               <button class="active" data-filter="todas">Todas</button>
               <button data-filter="pendientes">Pendientes</button>
               <button data-filter="alta">Prioridad alta</button>
+              <button data-filter="vencidas">Vencidas</button>
+              <button data-filter="proximas">Vencen pronto</button>
               <button data-filter="completadas">Completadas</button>
             </div>
 
@@ -710,8 +859,8 @@
               </div>
 
               <div class="tip">
-                <strong>2. Usá una caja “urgente”.</strong><br />
-                Llaves, DNI, cargador, medicación, toalla, ropa, papeles y elementos de higiene.
+                <strong>2. Usá fechas límite.</strong><br />
+                Poné fecha a lo que no se puede olvidar: flete, llaves, servicios, contrato y cajas urgentes.
               </div>
 
               <div class="tip">
@@ -846,6 +995,82 @@
       </div>
     </section>
 
+    <section id="tabBoxes" class="tab-content">
+      <div class="main-grid">
+        <main>
+          <section class="card">
+            <h2>🏷️ Cajas y etiquetas</h2>
+
+            <div class="warning">
+              Cargá el contenido de cada caja para poder imprimir etiquetas. Así sabés qué hay adentro sin tener que abrirlas.
+            </div>
+
+            <div class="box-grid">
+              <input id="boxName" type="text" placeholder="Nombre: Caja cocina 1" />
+              <input id="boxRoom" type="text" placeholder="Ambiente: Cocina" />
+
+              <select id="boxFragile">
+                <option value="No">No frágil</option>
+                <option value="Sí">Frágil</option>
+              </select>
+
+              <select id="boxOpenFirst">
+                <option value="No">No abrir primero</option>
+                <option value="Sí">Abrir primero</option>
+              </select>
+            </div>
+
+            <textarea id="boxContent" placeholder="Contenido: platos, vasos, cubiertos, repasadores..."></textarea>
+            <textarea id="boxNotes" placeholder="Observaciones: cuidado con vasos, pesada, contiene documentos, etc."></textarea>
+
+            <div class="actions">
+              <button class="btn-primary" id="addBoxBtn" type="button">Agregar caja</button>
+              <button class="btn-secondary" id="clearBoxBtn" type="button">Limpiar campos</button>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>📋 Cajas cargadas</h2>
+
+            <div id="boxesEmpty" class="empty">
+              Todavía no cargaste cajas.
+            </div>
+
+            <div id="boxesList" class="box-list"></div>
+
+            <div class="actions">
+              <button class="btn-green" id="printLabelsBtn" type="button">Imprimir etiquetas</button>
+              <button class="btn-secondary" id="downloadBoxesCsvBtn" type="button">Descargar CSV de cajas</button>
+              <button class="btn-secondary" id="copyBoxesBtn" type="button">Copiar detalle</button>
+              <button class="btn-danger" id="resetBoxesBtn" type="button">Borrar cajas</button>
+            </div>
+          </section>
+        </main>
+
+        <aside>
+          <section class="card">
+            <h2>🧠 Consejo práctico</h2>
+            <div class="tips">
+              <div class="tip">
+                <strong>Usá nombres simples:</strong><br />
+                Cocina 1, Cocina 2, Baño 1, Dormitorio 1, Urgente 1.
+              </div>
+
+              <div class="tip">
+                <strong>Marcá “Abrir primero”:</strong><br />
+                Para cajas con cargadores, medicación, higiene, ropa, documentos o elementos de cocina básicos.
+              </div>
+
+              <div class="tip">
+                <strong>Marcá “Frágil”:</strong><br />
+                Para vasos, platos, espejos, tecnología, cuadros o adornos.
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </section>
+
     <section id="tabNotes" class="tab-content">
       <div class="main-grid">
         <main>
@@ -922,25 +1147,26 @@
     let currentUser = null;
     let tasks = [];
     let inventory = [];
+    let boxes = [];
     let currentFilter = "todas";
     let saveTimer = null;
 
     const defaultTasks = [
-      { title: "Separar DNI, contrato, llaves y documentos importantes", category: "Documentos y servicios", priority: "alta", done: false },
-      { title: "Armar caja de primera noche: cargador, higiene, ropa, medicación y toalla", category: "Antes de mudarse", priority: "alta", done: false },
-      { title: "Confirmar día, horario y costo del flete", category: "Antes de mudarse", priority: "alta", done: false },
-      { title: "Pedir o conseguir cajas, bolsas, cinta y marcador grueso", category: "Cajas y embalaje", priority: "media", done: false },
-      { title: "Rotular cada caja con ambiente y contenido", category: "Cajas y embalaje", priority: "media", done: false },
-      { title: "Separar cosas para donar, tirar o vender", category: "Antes de mudarse", priority: "media", done: false },
-      { title: "Guardar medicamentos y elementos de salud en bolso aparte", category: "Antes de mudarse", priority: "alta", done: false },
-      { title: "Sacar fotos de conexiones de TV, internet, PC y electrodomésticos", category: "Antes de mudarse", priority: "media", done: false },
-      { title: "Cambiar domicilio o actualizar datos donde corresponda", category: "Documentos y servicios", priority: "media", done: false },
-      { title: "Coordinar internet, luz, gas, agua o expensas del nuevo lugar", category: "Documentos y servicios", priority: "alta", done: false },
-      { title: "Limpiar heladera y descongelar si hace falta", category: "Día de la mudanza", priority: "media", done: false },
-      { title: "Revisar que no quede nada en placares, baño, cocina y enchufes", category: "Día de la mudanza", priority: "alta", done: false },
-      { title: "Tener efectivo o medio de pago listo para flete e imprevistos", category: "Día de la mudanza", priority: "alta", done: false },
-      { title: "Probar llaves, cerraduras, luces, canillas y enchufes del nuevo lugar", category: "Después de mudarse", priority: "alta", done: false },
-      { title: "Comprar elementos básicos que falten: papel, jabón, focos, bolsas, comida simple", category: "Compras pendientes", priority: "media", done: false }
+      { title: "Separar DNI, contrato, llaves y documentos importantes", category: "Documentos y servicios", priority: "alta", dueDate: "", done: false },
+      { title: "Armar caja de primera noche: cargador, higiene, ropa, medicación y toalla", category: "Antes de mudarse", priority: "alta", dueDate: "", done: false },
+      { title: "Confirmar día, horario y costo del flete", category: "Antes de mudarse", priority: "alta", dueDate: "", done: false },
+      { title: "Pedir o conseguir cajas, bolsas, cinta y marcador grueso", category: "Cajas y embalaje", priority: "media", dueDate: "", done: false },
+      { title: "Rotular cada caja con ambiente y contenido", category: "Cajas y embalaje", priority: "media", dueDate: "", done: false },
+      { title: "Separar cosas para donar, tirar o vender", category: "Antes de mudarse", priority: "media", dueDate: "", done: false },
+      { title: "Guardar medicamentos y elementos de salud en bolso aparte", category: "Antes de mudarse", priority: "alta", dueDate: "", done: false },
+      { title: "Sacar fotos de conexiones de TV, internet, PC y electrodomésticos", category: "Antes de mudarse", priority: "media", dueDate: "", done: false },
+      { title: "Cambiar domicilio o actualizar datos donde corresponda", category: "Documentos y servicios", priority: "media", dueDate: "", done: false },
+      { title: "Coordinar internet, luz, gas, agua o expensas del nuevo lugar", category: "Documentos y servicios", priority: "alta", dueDate: "", done: false },
+      { title: "Limpiar heladera y descongelar si hace falta", category: "Día de la mudanza", priority: "media", dueDate: "", done: false },
+      { title: "Revisar que no quede nada en placares, baño, cocina y enchufes", category: "Día de la mudanza", priority: "alta", dueDate: "", done: false },
+      { title: "Tener efectivo o medio de pago listo para flete e imprevistos", category: "Día de la mudanza", priority: "alta", dueDate: "", done: false },
+      { title: "Probar llaves, cerraduras, luces, canillas y enchufes del nuevo lugar", category: "Después de mudarse", priority: "alta", dueDate: "", done: false },
+      { title: "Comprar elementos básicos que falten: papel, jabón, focos, bolsas, comida simple", category: "Compras pendientes", priority: "media", dueDate: "", done: false }
     ];
 
     const presets = [
@@ -979,6 +1205,84 @@
     function cleanCsv(value) {
       const stringValue = String(value).replaceAll('"', '""');
       return `"${stringValue}"`;
+    }
+
+    function todayISO() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return today.toISOString().slice(0, 10);
+    }
+
+    function parseLocalDate(dateString) {
+      if (!dateString) return null;
+      const [year, month, day] = dateString.split("-").map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return "Sin fecha";
+      const date = parseLocalDate(dateString);
+      return date.toLocaleDateString("es-AR");
+    }
+
+    function getDaysDiff(dateString) {
+      if (!dateString) return null;
+
+      const today = parseLocalDate(todayISO());
+      const due = parseLocalDate(dateString);
+
+      const diffMs = due.getTime() - today.getTime();
+      return Math.round(diffMs / 86400000);
+    }
+
+    function getDueStatus(task) {
+      if (!task.dueDate) {
+        return {
+          label: "Sin fecha",
+          className: "tag-sin-fecha",
+          type: "sin-fecha"
+        };
+      }
+
+      if (task.done) {
+        return {
+          label: "Completada",
+          className: "tag-ok",
+          type: "ok"
+        };
+      }
+
+      const diff = getDaysDiff(task.dueDate);
+
+      if (diff < 0) {
+        return {
+          label: `Vencida hace ${Math.abs(diff)} día${Math.abs(diff) === 1 ? "" : "s"}`,
+          className: "tag-vencida",
+          type: "vencida"
+        };
+      }
+
+      if (diff === 0) {
+        return {
+          label: "Vence hoy",
+          className: "tag-hoy",
+          type: "hoy"
+        };
+      }
+
+      if (diff <= 3) {
+        return {
+          label: `Vence en ${diff} día${diff === 1 ? "" : "s"}`,
+          className: "tag-pronto",
+          type: "pronto"
+        };
+      }
+
+      return {
+        label: `Vence el ${formatDate(task.dueDate)}`,
+        className: "tag-ok",
+        type: "futura"
+      };
     }
 
     function setSyncStatus(text) {
@@ -1038,7 +1342,13 @@
 
           tasks = Array.isArray(data.tasks) ? data.tasks : makeDefaultTasks();
           inventory = Array.isArray(data.inventory) ? data.inventory : [];
+          boxes = Array.isArray(data.boxes) ? data.boxes : [];
           $("notes").value = data.notes || "";
+
+          tasks = tasks.map(task => ({
+            dueDate: "",
+            ...task
+          }));
 
           if (tasks.length === 0) {
             tasks = makeDefaultTasks();
@@ -1046,6 +1356,7 @@
         } else {
           tasks = makeDefaultTasks();
           inventory = [];
+          boxes = [];
           $("notes").value = "";
           await saveCloudData();
         }
@@ -1068,6 +1379,7 @@
         await setDoc(getUserProgressRef(), {
           tasks,
           inventory,
+          boxes,
           notes: $("notes").value || "",
           updatedAt: new Date().toISOString()
         }, { merge: true });
@@ -1106,6 +1418,7 @@
       const title = $("taskInput").value.trim();
       const category = $("categoryInput").value;
       const priority = $("priorityInput").value;
+      const dueDate = $("dueDateInput").value;
 
       if (!title) {
         alert("Escribí una tarea primero.");
@@ -1117,10 +1430,12 @@
         title,
         category,
         priority,
+        dueDate,
         done: false
       });
 
       $("taskInput").value = "";
+      $("dueDateInput").value = "";
 
       scheduleSaveCloudData();
       renderAll();
@@ -1151,6 +1466,18 @@
       if (currentFilter === "pendientes") return tasks.filter(task => !task.done);
       if (currentFilter === "alta") return tasks.filter(task => task.priority === "alta" && !task.done);
       if (currentFilter === "completadas") return tasks.filter(task => task.done);
+
+      if (currentFilter === "vencidas") {
+        return tasks.filter(task => !task.done && getDueStatus(task).type === "vencida");
+      }
+
+      if (currentFilter === "proximas") {
+        return tasks.filter(task => {
+          const status = getDueStatus(task).type;
+          return !task.done && (status === "hoy" || status === "pronto");
+        });
+      }
+
       return tasks;
     }
 
@@ -1173,6 +1500,8 @@
         filtered
           .filter(task => task.category === category)
           .forEach(task => {
+            const due = getDueStatus(task);
+
             html += `
               <div class="task ${task.done ? "done" : ""}">
                 <input type="checkbox" ${task.done ? "checked" : ""} data-task-toggle="${task.id}" />
@@ -1181,6 +1510,8 @@
                   <div class="task-title">${escapeHtml(task.title)}</div>
                   <div class="task-meta">
                     <span class="tag ${task.priority}">Prioridad ${task.priority}</span>
+                    <span class="tag ${due.className}">${due.label}</span>
+                    ${task.dueDate ? `<span>Fecha límite: ${formatDate(task.dueDate)}</span>` : ""}
                     <span>${task.done ? "Completada" : "Pendiente"}</span>
                   </div>
                 </div>
@@ -1202,7 +1533,44 @@
       });
     }
 
+    function updateDeadlineAlerts() {
+      const overdue = tasks.filter(task => !task.done && getDueStatus(task).type === "vencida");
+      const today = tasks.filter(task => !task.done && getDueStatus(task).type === "hoy");
+      const soon = tasks.filter(task => !task.done && getDueStatus(task).type === "pronto");
+
+      const alertBox = $("deadlineAlerts");
+
+      if (overdue.length === 0 && today.length === 0 && soon.length === 0) {
+        alertBox.className = "alert-box ok";
+        alertBox.innerHTML = "No hay tareas vencidas ni próximas a vencer.";
+        return;
+      }
+
+      alertBox.className = "alert-box";
+
+      let html = "";
+
+      if (overdue.length > 0) {
+        html += `<strong>🔴 Tareas vencidas:</strong><ul>${overdue.map(t => `<li>${escapeHtml(t.title)} - ${formatDate(t.dueDate)}</li>`).join("")}</ul>`;
+      }
+
+      if (today.length > 0) {
+        html += `<strong>🟠 Vencen hoy:</strong><ul>${today.map(t => `<li>${escapeHtml(t.title)}</li>`).join("")}</ul>`;
+      }
+
+      if (soon.length > 0) {
+        html += `<strong>🟡 Vencen pronto:</strong><ul>${soon.map(t => `<li>${escapeHtml(t.title)} - ${formatDate(t.dueDate)}</li>`).join("")}</ul>`;
+      }
+
+      alertBox.innerHTML = html;
+    }
+
     function updateTodayFocus() {
+      const urgentByDate = tasks.filter(task => {
+        const status = getDueStatus(task).type;
+        return !task.done && (status === "vencida" || status === "hoy" || status === "pronto");
+      });
+
       const high = tasks.filter(task => task.priority === "alta" && !task.done);
       const pending = tasks.filter(task => !task.done);
 
@@ -1211,12 +1579,16 @@
         return;
       }
 
-      const focusTasks = high.length > 0 ? high.slice(0, 3) : pending.slice(0, 3);
+      const focusTasks = urgentByDate.length > 0
+        ? urgentByDate.slice(0, 3)
+        : high.length > 0
+          ? high.slice(0, 3)
+          : pending.slice(0, 3);
 
       $("todayFocus").innerHTML = `
         <strong>Prioridad sugerida:</strong>
         <ol>
-          ${focusTasks.map(task => `<li>${escapeHtml(task.title)}</li>`).join("")}
+          ${focusTasks.map(task => `<li>${escapeHtml(task.title)} ${task.dueDate ? `(${formatDate(task.dueDate)})` : ""}</li>`).join("")}
         </ol>
       `;
     }
@@ -1378,26 +1750,266 @@
       $("summaryVolumeMargin").textContent = summary.volumeMargin.toFixed(2) + " m³";
     }
 
+    function clearBoxForm() {
+      $("boxName").value = "";
+      $("boxRoom").value = "";
+      $("boxFragile").value = "No";
+      $("boxOpenFirst").value = "No";
+      $("boxContent").value = "";
+      $("boxNotes").value = "";
+    }
+
+    function addBox() {
+      const name = $("boxName").value.trim();
+      const room = $("boxRoom").value.trim();
+      const fragile = $("boxFragile").value;
+      const openFirst = $("boxOpenFirst").value;
+      const content = $("boxContent").value.trim();
+      const notes = $("boxNotes").value.trim();
+
+      if (!name) {
+        alert("Ingresá un nombre para la caja.");
+        return;
+      }
+
+      if (!content) {
+        alert("Ingresá el contenido de la caja.");
+        return;
+      }
+
+      boxes.unshift({
+        id: Date.now(),
+        name,
+        room,
+        fragile,
+        openFirst,
+        content,
+        notes,
+        createdAt: new Date().toISOString()
+      });
+
+      clearBoxForm();
+      scheduleSaveCloudData();
+      renderAll();
+    }
+
+    function deleteBox(id) {
+      if (!confirm("¿Eliminar esta caja?")) return;
+
+      boxes = boxes.filter(box => box.id !== id);
+
+      scheduleSaveCloudData();
+      renderAll();
+    }
+
+    function renderBoxes() {
+      const empty = $("boxesEmpty");
+      const list = $("boxesList");
+
+      if (boxes.length === 0) {
+        empty.style.display = "block";
+        list.innerHTML = "";
+        return;
+      }
+
+      empty.style.display = "none";
+
+      list.innerHTML = boxes.map(box => {
+        return `
+          <div class="box-card">
+            <h3>🏷️ ${escapeHtml(box.name)}</h3>
+
+            <div class="box-meta">
+              <span class="room-badge">${escapeHtml(box.room || "Sin ambiente")}</span>
+              <span class="tag ${box.fragile === "Sí" ? "alta" : "baja"}">Frágil: ${escapeHtml(box.fragile || "No")}</span>
+              <span class="tag ${box.openFirst === "Sí" ? "tag-hoy" : "tag-sin-fecha"}">Abrir primero: ${escapeHtml(box.openFirst || "No")}</span>
+            </div>
+
+            <div class="box-content">
+              <strong>Contenido:</strong><br>
+              ${escapeHtml(box.content || "-")}
+              ${box.notes ? `<br><br><strong>Observaciones:</strong><br>${escapeHtml(box.notes)}` : ""}
+            </div>
+
+            <div class="actions">
+              <button class="btn-danger" type="button" data-box-delete="${box.id}">Eliminar</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-box-delete]").forEach(button => {
+        button.addEventListener("click", () => deleteBox(Number(button.dataset.boxDelete)));
+      });
+    }
+
+    function buildBoxesText() {
+      if (boxes.length === 0) return "";
+
+      let text = "DETALLE DE CAJAS\n\n";
+
+      boxes.forEach(box => {
+        text += `CAJA: ${box.name}\n`;
+        text += `Ambiente: ${box.room || "Sin indicar"}\n`;
+        text += `Frágil: ${box.fragile || "No"}\n`;
+        text += `Abrir primero: ${box.openFirst || "No"}\n`;
+        text += `Contenido: ${box.content || "-"}\n`;
+        if (box.notes) text += `Observaciones: ${box.notes}\n`;
+        text += "\n-----------------------------\n\n";
+      });
+
+      return text;
+    }
+
+    function printBoxLabels() {
+      if (boxes.length === 0) {
+        alert("No hay cajas cargadas para imprimir.");
+        return;
+      }
+
+      const printWindow = window.open("", "_blank");
+
+      const labelsHtml = boxes.map(box => `
+        <div class="print-label">
+          <h2>🏷️ ${escapeHtml(box.name)}</h2>
+          <p><strong>Ambiente:</strong> ${escapeHtml(box.room || "Sin indicar")}</p>
+          <p><strong>Frágil:</strong> ${escapeHtml(box.fragile || "No")}</p>
+          <p><strong>Abrir primero:</strong> ${escapeHtml(box.openFirst || "No")}</p>
+          <p><strong>Contenido:</strong></p>
+          <p>${escapeHtml(box.content || "-").replaceAll("\n", "<br>")}</p>
+          ${box.notes ? `<p><strong>Observaciones:</strong></p><p>${escapeHtml(box.notes).replaceAll("\n", "<br>")}</p>` : ""}
+        </div>
+      `).join("");
+
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <title>Etiquetas de cajas - ReloReady</title>
+          <style>
+            body {
+              font-family: Arial, Helvetica, sans-serif;
+              padding: 20px;
+              color: #111827;
+            }
+
+            h1 {
+              margin-top: 0;
+            }
+
+            .print-label {
+              border: 2px solid #111827;
+              border-radius: 12px;
+              padding: 14px;
+              margin-bottom: 12px;
+              page-break-inside: avoid;
+            }
+
+            .print-label h2 {
+              margin: 0 0 8px;
+              font-size: 22px;
+            }
+
+            .no-print {
+              margin-bottom: 20px;
+            }
+
+            button {
+              padding: 10px 14px;
+              border: none;
+              border-radius: 10px;
+              background: #2563eb;
+              color: white;
+              font-weight: bold;
+              cursor: pointer;
+            }
+
+            @media print {
+              .no-print {
+                display: none;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="no-print">
+            <h1>Etiquetas de cajas</h1>
+            <button onclick="window.print()">Imprimir</button>
+          </div>
+          ${labelsHtml}
+        </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+    }
+
+    function downloadBoxesCSV() {
+      if (boxes.length === 0) {
+        alert("No hay cajas cargadas para descargar.");
+        return;
+      }
+
+      let csv = "Caja,Ambiente,Fragil,Abrir primero,Contenido,Observaciones\n";
+
+      boxes.forEach(box => {
+        csv += [
+          cleanCsv(box.name),
+          cleanCsv(box.room || ""),
+          cleanCsv(box.fragile || "No"),
+          cleanCsv(box.openFirst || "No"),
+          cleanCsv(box.content || ""),
+          cleanCsv(box.notes || "")
+        ].join(",") + "\n";
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "cajas_mudanza.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(url);
+    }
+
+    function resetBoxes() {
+      if (!confirm("¿Borrar todas las cajas cargadas?")) return;
+
+      boxes = [];
+      scheduleSaveCloudData();
+      renderAll();
+    }
+
     function updateStats() {
       const total = tasks.length;
       const done = tasks.filter(task => task.done).length;
+      const overdue = tasks.filter(task => !task.done && getDueStatus(task).type === "vencida").length;
       const progress = total === 0 ? 0 : Math.round((done / total) * 100);
       const invSummary = getInventorySummary();
 
       $("totalTasks").textContent = total;
       $("doneTasks").textContent = done;
+      $("overdueTasks").textContent = overdue;
       $("totalObjects").textContent = inventory.length;
+      $("totalBoxes").textContent = boxes.length;
       $("totalVolume").textContent = invSummary.volume.toFixed(2) + " m³";
       $("progressText").textContent = progress + "%";
       $("progressBar").style.width = progress + "%";
 
       updateTodayFocus();
+      updateDeadlineAlerts();
       updateInventorySummary();
     }
 
     function renderAll() {
       renderTasks();
       renderInventory();
+      renderBoxes();
       updateStats();
     }
 
@@ -1434,6 +2046,7 @@
       const done = tasks.filter(task => task.done);
       const notes = $("notes").value.trim();
       const inventoryText = buildInventoryText();
+      const boxesText = buildBoxesText();
 
       let summary = "RESUMEN COMPLETO DE MUDANZA\n\n";
 
@@ -1442,7 +2055,8 @@
         summary += "- Sin pendientes.\n";
       } else {
         pending.forEach(task => {
-          summary += `- [${task.priority.toUpperCase()}] ${task.title} (${task.category})\n`;
+          const due = task.dueDate ? ` - Vence: ${formatDate(task.dueDate)}` : "";
+          summary += `- [${task.priority.toUpperCase()}] ${task.title} (${task.category})${due}\n`;
         });
       }
 
@@ -1457,6 +2071,10 @@
 
       if (inventoryText) {
         summary += "\n" + inventoryText + "\n";
+      }
+
+      if (boxesText) {
+        summary += "\n" + boxesText + "\n";
       }
 
       if (notes) {
@@ -1543,6 +2161,16 @@
       window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
     }
 
+    function copyBoxesSummary() {
+      const text = buildBoxesText();
+      if (!text) {
+        alert("No hay cajas cargadas.");
+        return;
+      }
+
+      copyText(text, "Detalle de cajas copiado.");
+    }
+
     function copyFullSummary() {
       copyText(buildFullSummary(), "Resumen completo copiado.");
     }
@@ -1565,10 +2193,11 @@
     }
 
     function resetAll() {
-      if (!confirm("Esto borrará tareas, inventario y notas. ¿Seguro?")) return;
+      if (!confirm("Esto borrará tareas, inventario, cajas y notas. ¿Seguro?")) return;
 
       tasks = makeDefaultTasks();
       inventory = [];
+      boxes = [];
       $("notes").value = "";
 
       scheduleSaveCloudData();
@@ -1601,6 +2230,13 @@
       $("copyInventoryBtn").addEventListener("click", copyInventorySummary);
       $("shareInventoryBtn").addEventListener("click", shareInventoryWhatsApp);
       $("resetInventoryBtn").addEventListener("click", resetInventory);
+
+      $("addBoxBtn").addEventListener("click", addBox);
+      $("clearBoxBtn").addEventListener("click", clearBoxForm);
+      $("printLabelsBtn").addEventListener("click", printBoxLabels);
+      $("downloadBoxesCsvBtn").addEventListener("click", downloadBoxesCSV);
+      $("copyBoxesBtn").addEventListener("click", copyBoxesSummary);
+      $("resetBoxesBtn").addEventListener("click", resetBoxes);
 
       $("saveNotesBtn").addEventListener("click", saveNotes);
       $("copyFullBtn").addEventListener("click", copyFullSummary);
