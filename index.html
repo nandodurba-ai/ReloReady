@@ -11,9 +11,9 @@
         Ingresá con Google para guardar tu checklist, inventario y notas de mudanza en la nube.
       </p>
 
-      <button class="btn-google" onclick="loginWithGoogle()">
-        🔐 Ingresar con Google
-      </button>
+<button class="btn-google" id="loginBtn">
+  🔐 Ingresar con Google
+</button>
 
       <div class="login-help">
         Si el botón no funciona, revisá que hayas pegado tu configuración de Firebase,
@@ -49,6 +49,40 @@ old_script_start = '''  <script>
     let currentFilter = "todas";'''
 
 new_script_start = '''  <script type="module">
+
+  async function loginWithGoogle() {
+  if (!firebaseReady) {
+    document.getElementById("firebaseWarning").style.display = "block";
+    alert("Primero tenés que pegar tu configuración de Firebase en el archivo index.html.");
+    return;
+  }
+
+  try {
+    await signInWithPopup(auth, provider);
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error);
+
+    if (error.code === "auth/operation-not-allowed") {
+      alert("Tenés que habilitar Google Sign-In en Firebase Authentication.");
+      return;
+    }
+
+    if (error.code === "auth/unauthorized-domain") {
+      alert("El dominio no está autorizado. Agregá nandodurba-ai.github.io en Firebase Authentication → Settings → Authorized domains.");
+      return;
+    }
+
+    if (error.code === "auth/popup-blocked") {
+      alert("El navegador bloqueó la ventana de Google. Permití popups para este sitio.");
+      return;
+    }
+
+    alert("No se pudo iniciar sesión con Google.");
+  }
+}
+
+window.loginWithGoogle = loginWithGoogle;
+  
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 
     import {
