@@ -2,33 +2,595 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReloReady - Organizador de Mudanza</title>
+
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --green: #16a34a;
+      --yellow: #f59e0b;
+      --red: #dc2626;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --soft-blue: #dbeafe;
+      --soft-green: #dcfce7;
+      --soft-yellow: #fef3c7;
+      --soft-red: #fee2e2;
+      --soft-purple: #ede9fe;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #eef4ff, #f8fafc);
+      color: var(--text);
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: 15px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      outline: none;
+      background: #fff;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 14px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+
+    .btn-danger {
+      background: var(--soft-red);
+      color: var(--red);
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #dbeafe, #f8fafc);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 460px;
+      background: white;
+      border-radius: 24px;
+      padding: 28px;
+      text-align: center;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+      border: 1px solid var(--border);
+    }
+
+    .login-card h1 {
+      color: var(--primary-dark);
+      margin: 0 0 10px;
+      font-size: 30px;
+    }
+
+    .login-card p {
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .login-help {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .app {
+      max-width: 1250px;
+      margin: auto;
+      padding: 20px;
+      display: none;
+    }
+
+    header {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      color: var(--primary-dark);
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .user-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      padding: 12px 16px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .user-info-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: #dbeafe;
+      object-fit: cover;
+      border: 1px solid #bfdbfe;
+      display: none;
+    }
+
+    .sync-status {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+      border: 1px solid var(--border);
+    }
+
+    .stat-card span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: 28px;
+      margin-top: 6px;
+      color: var(--primary-dark);
+    }
+
+    .progress-wrap {
+      background: #e5e7eb;
+      height: 14px;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--green));
+      transition: width 0.3s ease;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tabs button {
+      background: #e5e7eb;
+      color: #111827;
+      border-radius: 999px;
+      padding: 12px 18px;
+    }
+
+    .tabs button.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: var(--primary-dark);
+      font-size: 22px;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      color: #111827;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 170px 150px;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 750px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .object-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 90px 90px 90px 90px 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 950px) {
+      .object-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 550px) {
+      .object-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .filters button {
+      background: #eef2ff;
+      color: #3730a3;
+      padding: 9px 12px;
+      font-size: 14px;
+    }
+
+    .filters button.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .section-title {
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: var(--soft-blue);
+      color: var(--primary-dark);
+      margin: 18px 0 10px;
+      font-weight: bold;
+    }
+
+    .task {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+
+    .task.done {
+      opacity: 0.62;
+      background: #f9fafb;
+    }
+
+    .task.done .task-title {
+      text-decoration: line-through;
+    }
+
+    .task input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--green);
+      margin-top: 3px;
+    }
+
+    .task-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      line-height: 1.35;
+    }
+
+    .task-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .alta {
+      background: var(--soft-red);
+      color: var(--red);
+    }
+
+    .media {
+      background: var(--soft-yellow);
+      color: #92400e;
+    }
+
+    .baja {
+      background: var(--soft-green);
+      color: var(--green);
+    }
+
+    .delete-btn {
+      background: transparent;
+      color: var(--red);
+      padding: 4px 6px;
+      font-size: 18px;
+    }
+
+    .tips {
+      display: grid;
+      gap: 10px;
+    }
+
+    .tip {
+      padding: 13px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      line-height: 1.45;
+    }
+
+    .tip strong {
+      color: var(--primary-dark);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 25px;
+      border: 2px dashed var(--border);
+      border-radius: 18px;
+      background: #f9fafb;
+    }
+
+    .today-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+      padding: 14px;
+      border-radius: 16px;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .object-table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #334155;
+      position: sticky;
+      top: 0;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--soft-purple);
+      color: #5b21b6;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      line-height: 1.5;
+    }
+
+    .summary-box strong {
+      color: var(--primary-dark);
+    }
+
+    .preset-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .preset-buttons button {
+      background: #eef2ff;
+      color: #3730a3;
+      font-size: 13px;
+      padding: 9px 11px;
+    }
+
+    .preset-buttons button:hover {
+      background: #c7d2fe;
+    }
+
+    .warning {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      border-radius: 16px;
+      padding: 14px;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .room-badge {
+      background: #e0f2fe;
+      color: #075985;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
   <div id="loginScreen" class="login-screen">
     <div class="login-card">
-      <h1>🧳 Organizador de Mudanza</h1>
-      <p>
-        Ingresá con Google para guardar tu checklist, inventario y notas de mudanza en la nube.
-      </p>
+      <h1>🧳 ReloReady</h1>
+      <p>Ingresá con Google para guardar tu checklist, inventario y notas de mudanza en la nube.</p>
 
-<button class="btn-google" id="loginBtn">
-  🔐 Ingresar con Google
-</button>
+      <button class="btn-primary" id="loginBtn" type="button">
+        🔐 Ingresar con Google
+      </button>
 
       <div class="login-help">
-        Si el botón no funciona, revisá que hayas pegado tu configuración de Firebase,
-        habilitado Google Sign-In y autorizado el dominio de GitHub Pages.
+        Si no ingresa, verificá en Firebase que esté habilitado Google Sign-In, que exista Firestore y que el dominio de GitHub esté autorizado.
       </div>
     </div>
   </div>
 
-  <div class="app" id="app" style="display:none;">
-    <div id="firebaseWarning" class="firebase-warning">
-      <strong>Falta configurar Firebase.</strong><br>
-      Abrí el archivo <strong>index.html</strong> y reemplazá los valores que dicen
-      <strong>PEGAR_...</strong> por los datos reales de tu proyecto Firebase.
-    </div>
-
+  <div class="app" id="app">
     <div class="user-bar">
       <div class="user-info-wrap">
         <img id="userAvatar" class="user-avatar" alt="Usuario" />
@@ -38,51 +600,294 @@
         </div>
       </div>
 
-      <button class="btn-secondary" onclick="logoutGoogle()">Cerrar sesión</button>
-    </div>'''
-html = html.replace(old, new)
+      <button class="btn-secondary" id="logoutBtn" type="button">Cerrar sesión</button>
+    </div>
 
-# 3) Replace script start with module imports
-old_script_start = '''  <script>
-    let tasks = [];
-    let inventory = [];
-    let currentFilter = "todas";'''
+    <header>
+      <h1>🧳 ReloReady - Organizador de Mudanza</h1>
+      <p>
+        Herramienta para organizar una mudanza paso a paso, evitar olvidos, calcular volumen aproximado de muebles y generar un listado descargable para enviar a la empresa de mudanza.
+      </p>
+    </header>
 
-new_script_start = '''  <script type="module">
+    <section class="dashboard">
+      <div class="stat-card">
+        <span>Tareas totales</span>
+        <strong id="totalTasks">0</strong>
+      </div>
 
-  async function loginWithGoogle() {
-  if (!firebaseReady) {
-    document.getElementById("firebaseWarning").style.display = "block";
-    alert("Primero tenés que pegar tu configuración de Firebase en el archivo index.html.");
-    return;
-  }
+      <div class="stat-card">
+        <span>Completadas</span>
+        <strong id="doneTasks">0</strong>
+      </div>
 
-  try {
-    await signInWithPopup(auth, provider);
-  } catch (error) {
-    console.error("Error al iniciar sesión:", error);
+      <div class="stat-card">
+        <span>Objetos cargados</span>
+        <strong id="totalObjects">0</strong>
+      </div>
 
-    if (error.code === "auth/operation-not-allowed") {
-      alert("Tenés que habilitar Google Sign-In en Firebase Authentication.");
-      return;
-    }
+      <div class="stat-card">
+        <span>Volumen estimado</span>
+        <strong id="totalVolume">0 m³</strong>
+      </div>
 
-    if (error.code === "auth/unauthorized-domain") {
-      alert("El dominio no está autorizado. Agregá nandodurba-ai.github.io en Firebase Authentication → Settings → Authorized domains.");
-      return;
-    }
+      <div class="stat-card">
+        <span>Progreso de tareas</span>
+        <strong id="progressText">0%</strong>
+        <div class="progress-wrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+    </section>
 
-    if (error.code === "auth/popup-blocked") {
-      alert("El navegador bloqueó la ventana de Google. Permití popups para este sitio.");
-      return;
-    }
+    <div class="tabs">
+      <button class="active" data-tab="tabChecklist">✅ Checklist</button>
+      <button data-tab="tabInventory">📦 Inventario para mudanza</button>
+      <button data-tab="tabNotes">📝 Notas y resumen</button>
+    </div>
 
-    alert("No se pudo iniciar sesión con Google.");
-  }
-}
+    <section id="tabChecklist" class="tab-content active">
+      <div class="main-grid">
+        <main>
+          <section class="card">
+            <h2>➕ Agregar tarea rápida</h2>
 
-window.loginWithGoogle = loginWithGoogle;
-  
+            <div class="form-grid">
+              <input id="taskInput" type="text" placeholder="Ej: separar ropa de invierno" />
+
+              <select id="categoryInput">
+                <option value="Antes de mudarse">Antes de mudarse</option>
+                <option value="Documentos y servicios">Documentos y servicios</option>
+                <option value="Cajas y embalaje">Cajas y embalaje</option>
+                <option value="Día de la mudanza">Día de la mudanza</option>
+                <option value="Después de mudarse">Después de mudarse</option>
+                <option value="Compras pendientes">Compras pendientes</option>
+              </select>
+
+              <select id="priorityInput">
+                <option value="alta">Alta</option>
+                <option value="media" selected>Media</option>
+                <option value="baja">Baja</option>
+              </select>
+            </div>
+
+            <button class="btn-primary" id="addTaskBtn" type="button">Agregar tarea</button>
+
+            <p class="small">
+              Para TDAH conviene cargar tareas chicas y concretas: “rotular caja baño”, “guardar DNI”, “desenchufar heladera”, etc.
+            </p>
+          </section>
+
+          <section class="card">
+            <h2>✅ Checklist de mudanza</h2>
+
+            <div class="filters">
+              <button class="active" data-filter="todas">Todas</button>
+              <button data-filter="pendientes">Pendientes</button>
+              <button data-filter="alta">Prioridad alta</button>
+              <button data-filter="completadas">Completadas</button>
+            </div>
+
+            <div id="taskList"></div>
+          </section>
+        </main>
+
+        <aside>
+          <section class="card">
+            <h2>🔥 Lo más importante hoy</h2>
+            <div class="today-box" id="todayFocus">
+              Todavía no hay tareas cargadas.
+            </div>
+            <button class="btn-secondary" id="suggestTodayBtn" type="button">Sugerir 3 tareas para hoy</button>
+          </section>
+
+          <section class="card">
+            <h2>🧠 Modo TDAH</h2>
+            <div class="tips">
+              <div class="tip">
+                <strong>1. No confíes en la memoria.</strong><br />
+                Si te acordás de algo, cargalo en la lista en ese momento.
+              </div>
+
+              <div class="tip">
+                <strong>2. Usá una caja “urgente”.</strong><br />
+                Llaves, DNI, cargador, medicación, toalla, ropa, papeles y elementos de higiene.
+              </div>
+
+              <div class="tip">
+                <strong>3. Separá por ambientes.</strong><br />
+                Cocina, baño, dormitorio, living, patio, documentos.
+              </div>
+
+              <div class="tip">
+                <strong>4. Hacé tandas cortas.</strong><br />
+                20 minutos de embalaje y 5 minutos de pausa. Mejor poco y constante que querer hacer todo junto.
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </section>
+
+    <section id="tabInventory" class="tab-content">
+      <div class="main-grid">
+        <main>
+          <section class="card">
+            <h2>📦 Inventario para empresa de mudanza</h2>
+
+            <div class="warning">
+              <strong>Importante:</strong> para calcular espacio en el camión se usa principalmente el volumen en <strong>m³</strong>.
+              El m² indica superficie de base, pero el m³ estima cuánto ocupa el objeto en alto, ancho y profundidad.
+            </div>
+
+            <h3>Agregar objeto</h3>
+
+            <div class="object-grid">
+              <input id="objectName" type="text" placeholder="Objeto: cama, heladera, sillón..." />
+              <input id="objectQty" type="number" min="1" value="1" placeholder="Cant." />
+              <input id="objectWidth" type="number" min="0" step="0.01" placeholder="Ancho m" />
+              <input id="objectDepth" type="number" min="0" step="0.01" placeholder="Prof. m" />
+              <input id="objectHeight" type="number" min="0" step="0.01" placeholder="Alto m" />
+              <input id="objectRoom" type="text" placeholder="Ambiente: cocina, living..." />
+            </div>
+
+            <textarea id="objectNotes" placeholder="Observaciones: frágil, desarmable, pesado, requiere 2 personas, subir por escalera, etc."></textarea>
+
+            <div class="actions">
+              <button class="btn-primary" id="addObjectBtn" type="button">Agregar objeto</button>
+              <button class="btn-secondary" id="clearObjectBtn" type="button">Limpiar campos</button>
+            </div>
+
+            <h3>Objetos rápidos</h3>
+            <p class="small">
+              Tocá un botón para cargar medidas aproximadas. Después podés editarlas antes de agregar.
+            </p>
+
+            <div class="preset-buttons" id="presetButtons"></div>
+          </section>
+
+          <section class="card">
+            <h2>📋 Listado cargado</h2>
+
+            <div id="inventoryEmpty" class="empty">
+              Todavía no cargaste objetos.
+            </div>
+
+            <div class="object-table-wrap" id="inventoryTableWrap" style="display:none;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Objeto</th>
+                    <th>Cant.</th>
+                    <th>Ancho</th>
+                    <th>Prof.</th>
+                    <th>Alto</th>
+                    <th>m² base</th>
+                    <th>m³ total</th>
+                    <th>Ambiente</th>
+                    <th>Obs.</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryBody"></tbody>
+              </table>
+            </div>
+
+            <div class="actions">
+              <button class="btn-green" id="downloadCsvBtn" type="button">Descargar CSV</button>
+              <button class="btn-secondary" id="copyInventoryBtn" type="button">Copiar resumen</button>
+              <button class="btn-secondary" id="shareInventoryBtn" type="button">Enviar por WhatsApp</button>
+              <button class="btn-danger" id="resetInventoryBtn" type="button">Borrar inventario</button>
+            </div>
+          </section>
+        </main>
+
+        <aside>
+          <section class="card">
+            <h2>📐 Resumen de volumen</h2>
+            <div class="summary-box">
+              <p><strong>Objetos cargados:</strong> <span id="summaryObjects">0</span></p>
+              <p><strong>Cantidad total de bultos:</strong> <span id="summaryUnits">0</span></p>
+              <p><strong>Superficie base aproximada:</strong> <span id="summaryArea">0 m²</span></p>
+              <p><strong>Volumen aproximado:</strong> <span id="summaryVolume">0 m³</span></p>
+              <p><strong>Volumen con margen 20%:</strong> <span id="summaryVolumeMargin">0 m³</span></p>
+            </div>
+
+            <p class="small">
+              El margen del 20% ayuda porque las cosas no siempre encajan perfecto en el camión.
+            </p>
+          </section>
+
+          <section class="card">
+            <h2>🚚 Datos útiles para pasar al flete</h2>
+            <div class="tips">
+              <div class="tip">
+                <strong>Origen y destino:</strong><br />
+                Dirección, piso, ascensor, escalera, distancia hasta la puerta.
+              </div>
+
+              <div class="tip">
+                <strong>Objetos pesados:</strong><br />
+                Heladera, lavarropas, ropero, sillón grande, cama, mesa pesada.
+              </div>
+
+              <div class="tip">
+                <strong>Objetos frágiles:</strong><br />
+                TV, espejos, vajilla, cuadros, PC, monitores.
+              </div>
+
+              <div class="tip">
+                <strong>Condiciones:</strong><br />
+                Si hay que desarmar muebles, subir por escalera o usar sogas/elevador.
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </section>
+
+    <section id="tabNotes" class="tab-content">
+      <div class="main-grid">
+        <main>
+          <section class="card">
+            <h2>📝 Notas rápidas</h2>
+            <textarea id="notes" placeholder="Ej: llamar al flete, pedir cajas, cambiar domicilio, revisar contrato, pedir permiso en edificio..."></textarea>
+
+            <div class="actions">
+              <button class="btn-secondary" id="saveNotesBtn" type="button">Guardar notas</button>
+              <button class="btn-secondary" id="copyFullBtn" type="button">Copiar resumen completo</button>
+              <button class="btn-secondary" id="shareFullBtn" type="button">Enviar resumen completo por WhatsApp</button>
+              <button class="btn-danger" id="resetAllBtn" type="button">Reiniciar todo</button>
+            </div>
+          </section>
+        </main>
+
+        <aside>
+          <section class="card">
+            <h2>✅ Revisión final</h2>
+            <div class="tips">
+              <div class="tip">
+                <strong>Antes de salir:</strong><br />
+                Revisar enchufes, placares, baño, cocina, patio, llaves, documentos y medicación.
+              </div>
+
+              <div class="tip">
+                <strong>Al llegar:</strong><br />
+                Probar luces, agua, cerraduras, enchufes, gas, internet y estado general.
+              </div>
+
+              <div class="tip">
+                <strong>Para no olvidarte:</strong><br />
+                Sacá fotos de cada ambiente antes de irte y de cada caja importante.
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 
     import {
@@ -100,26 +905,6 @@ window.loginWithGoogle = loginWithGoogle;
       setDoc
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    /*
-      ==========================================================
-      CONFIGURACIÓN FIREBASE
-      ==========================================================
-
-      1) Entrá a Firebase Console.
-      2) Proyecto → Configuración del proyecto → General.
-      3) Agregá una app web.
-      4) Copiá el firebaseConfig y reemplazá estos valores.
-
-      También tenés que:
-      - Habilitar Authentication → Sign-in method → Google.
-      - Crear Firestore Database.
-      - Agregar tu dominio de GitHub Pages en:
-        Authentication → Settings → Authorized domains.
-
-      Ejemplo de dominio:
-      tuusuario.github.io
-    */
-
     const firebaseConfig = {
       apiKey: "AIzaSyAVqJB2qipLZxlWy76qldWCouqJQHlBU1w",
       authDomain: "reloready-3d268.firebaseapp.com",
@@ -128,12 +913,6 @@ window.loginWithGoogle = loginWithGoogle;
       messagingSenderId: "320535839013",
       appId: "1:320535839013:web:e726d6e2f55dec0c66dacc"
     };
-
-    const firebaseReady =
-      firebaseConfig.apiKey &&
-      !firebaseConfig.apiKey.startsWith("PEGAR_") &&
-      firebaseConfig.projectId &&
-      !firebaseConfig.projectId.startsWith("PEGAR_");
 
     const firebaseApp = initializeApp(firebaseConfig);
     const auth = getAuth(firebaseApp);
@@ -144,154 +923,80 @@ window.loginWithGoogle = loginWithGoogle;
     let tasks = [];
     let inventory = [];
     let currentFilter = "todas";
-    let saveTimer = null;'''
-html = html.replace(old_script_start, new_script_start)
+    let saveTimer = null;
 
-# 4) Replace loadData and save functions block manually
-old_block = '''    function loadData() {
-      const savedTasks = localStorage.getItem("mudanzaTasks");
-      const savedNotes = localStorage.getItem("mudanzaNotes");
-      const savedInventory = localStorage.getItem("mudanzaInventory");
+    const defaultTasks = [
+      { title: "Separar DNI, contrato, llaves y documentos importantes", category: "Documentos y servicios", priority: "alta", done: false },
+      { title: "Armar caja de primera noche: cargador, higiene, ropa, medicación y toalla", category: "Antes de mudarse", priority: "alta", done: false },
+      { title: "Confirmar día, horario y costo del flete", category: "Antes de mudarse", priority: "alta", done: false },
+      { title: "Pedir o conseguir cajas, bolsas, cinta y marcador grueso", category: "Cajas y embalaje", priority: "media", done: false },
+      { title: "Rotular cada caja con ambiente y contenido", category: "Cajas y embalaje", priority: "media", done: false },
+      { title: "Separar cosas para donar, tirar o vender", category: "Antes de mudarse", priority: "media", done: false },
+      { title: "Guardar medicamentos y elementos de salud en bolso aparte", category: "Antes de mudarse", priority: "alta", done: false },
+      { title: "Sacar fotos de conexiones de TV, internet, PC y electrodomésticos", category: "Antes de mudarse", priority: "media", done: false },
+      { title: "Cambiar domicilio o actualizar datos donde corresponda", category: "Documentos y servicios", priority: "media", done: false },
+      { title: "Coordinar internet, luz, gas, agua o expensas del nuevo lugar", category: "Documentos y servicios", priority: "alta", done: false },
+      { title: "Limpiar heladera y descongelar si hace falta", category: "Día de la mudanza", priority: "media", done: false },
+      { title: "Revisar que no quede nada en placares, baño, cocina y enchufes", category: "Día de la mudanza", priority: "alta", done: false },
+      { title: "Tener efectivo o medio de pago listo para flete e imprevistos", category: "Día de la mudanza", priority: "alta", done: false },
+      { title: "Probar llaves, cerraduras, luces, canillas y enchufes del nuevo lugar", category: "Después de mudarse", priority: "alta", done: false },
+      { title: "Comprar elementos básicos que falten: papel, jabón, focos, bolsas, comida simple", category: "Compras pendientes", priority: "media", done: false }
+    ];
 
-      if (savedTasks) {
-        tasks = JSON.parse(savedTasks);
-      } else {
-        tasks = defaultTasks.map((task, index) => ({
-          id: Date.now() + index,
-          ...task
-        }));
-        saveTasks();
-      }
+    const presets = [
+      ["Cama 1 plaza", 1, 0.90, 1.90, 0.35, "Dormitorio"],
+      ["Cama 2 plazas", 1, 1.40, 1.90, 0.35, "Dormitorio"],
+      ["Cama queen", 1, 1.60, 2.00, 0.35, "Dormitorio"],
+      ["Colchón 2 plazas", 1, 1.40, 1.90, 0.25, "Dormitorio"],
+      ["Heladera", 1, 0.70, 0.70, 1.75, "Cocina"],
+      ["Lavarropas", 1, 0.60, 0.60, 0.85, "Lavadero"],
+      ["Sillón 2 cuerpos", 1, 1.60, 0.85, 0.85, "Living"],
+      ["Sillón 3 cuerpos", 1, 2.10, 0.90, 0.85, "Living"],
+      ["Mesa comedor", 1, 1.40, 0.80, 0.75, "Comedor"],
+      ["Silla", 1, 0.45, 0.45, 0.90, "Comedor"],
+      ["TV", 1, 1.10, 0.15, 0.70, "Living"],
+      ["Mueble TV", 1, 1.60, 0.40, 0.60, "Living"],
+      ["Ropero", 1, 1.20, 0.55, 1.90, "Dormitorio"],
+      ["Cómoda", 1, 0.90, 0.45, 0.85, "Dormitorio"],
+      ["Mesa de luz", 1, 0.45, 0.40, 0.55, "Dormitorio"],
+      ["Escritorio", 1, 1.20, 0.60, 0.75, "Oficina"],
+      ["Caja chica", 1, 0.40, 0.30, 0.30, "Cajas"],
+      ["Caja mediana", 1, 0.50, 0.40, 0.40, "Cajas"],
+      ["Caja grande", 1, 0.60, 0.50, 0.50, "Cajas"]
+    ];
 
-      if (savedInventory) {
-        inventory = JSON.parse(savedInventory);
-      }
+    const $ = (id) => document.getElementById(id);
 
-      if (savedNotes) {
-        document.getElementById("notes").value = savedNotes;
-      }
-
-      renderTasks();
-      renderInventory();
-      updateStats();
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    function saveTasks() {
-      localStorage.setItem("mudanzaTasks", JSON.stringify(tasks));
-    }
-
-    function saveInventory() {
-      localStorage.setItem("mudanzaInventory", JSON.stringify(inventory));
-    }
-
-    function saveNotes() {
-      const notes = document.getElementById("notes").value;
-      localStorage.setItem("mudanzaNotes", notes);
-      alert("Notas guardadas.");
-    }'''
-
-new_block = '''    function getUserProgressRef() {
-      return doc(db, "users", currentUser.uid, "mudanza", "progreso");
+    function cleanCsv(value) {
+      const stringValue = String(value).replaceAll('"', '""');
+      return `"${stringValue}"`;
     }
 
     function setSyncStatus(text) {
-      const el = document.getElementById("syncStatus");
-      if (el) el.textContent = text;
+      $("syncStatus").textContent = text;
     }
 
-    async function loadCloudData() {
-      if (!currentUser) return;
-
-      setSyncStatus("Cargando progreso...");
-
-      try {
-        const snap = await getDoc(getUserProgressRef());
-
-        if (snap.exists()) {
-          const data = snap.data();
-
-          tasks = Array.isArray(data.tasks) ? data.tasks : [];
-          inventory = Array.isArray(data.inventory) ? data.inventory : [];
-
-          const notesBox = document.getElementById("notes");
-          if (notesBox) notesBox.value = data.notes || "";
-
-          if (tasks.length === 0) {
-            tasks = defaultTasks.map((task, index) => ({
-              id: Date.now() + index,
-              ...task
-            }));
-            await saveCloudData();
-          }
-        } else {
-          tasks = defaultTasks.map((task, index) => ({
-            id: Date.now() + index,
-            ...task
-          }));
-          inventory = [];
-
-          const notesBox = document.getElementById("notes");
-          if (notesBox) notesBox.value = "";
-
-          await saveCloudData();
-        }
-
-        setSyncStatus("Progreso cargado y sincronizado");
-      } catch (error) {
-        console.error("Error cargando datos desde Firestore:", error);
-        setSyncStatus("Error al cargar datos");
-
-        alert(
-          "No se pudo cargar el progreso desde Firebase. Revisá las reglas de Firestore y la configuración del proyecto."
-        );
-      }
+    function getUserProgressRef() {
+      return doc(db, "users", currentUser.uid, "mudanza", "progreso");
     }
 
-    async function saveCloudData() {
-      if (!currentUser) return;
-
-      const notes = document.getElementById("notes")?.value || "";
-
-      try {
-        setSyncStatus("Guardando...");
-
-        await setDoc(getUserProgressRef(), {
-          tasks,
-          inventory,
-          notes,
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
-
-        setSyncStatus("Guardado en la nube");
-      } catch (error) {
-        console.error("Error guardando datos en Firestore:", error);
-        setSyncStatus("Error al guardar");
-
-        alert(
-          "No se pudo guardar en Firebase. Revisá las reglas de Firestore y la conexión."
-        );
-      }
+    function makeDefaultTasks() {
+      return defaultTasks.map((task, index) => ({
+        id: Date.now() + index,
+        ...task
+      }));
     }
 
-    function scheduleSaveCloudData() {
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(() => {
-        saveCloudData();
-      }, 500);
-    }
-
-    function saveNotes() {
-      saveCloudData();
-      alert("Notas guardadas en tu cuenta.");
-    }
-
-    window.loginWithGoogle = async function () {
-      if (!firebaseReady) {
-        document.getElementById("firebaseWarning").style.display = "block";
-        alert("Primero tenés que pegar tu configuración de Firebase en el archivo index.html.");
-        return;
-      }
-
+    async function loginWithGoogle() {
       try {
         await signInWithPopup(auth, provider);
       } catch (error) {
@@ -303,7 +1008,7 @@ new_block = '''    function getUserProgressRef() {
         }
 
         if (error.code === "auth/unauthorized-domain") {
-          alert("El dominio no está autorizado. Agregá tu dominio de GitHub Pages en Firebase Authentication → Settings → Authorized domains.");
+          alert("El dominio no está autorizado. Agregá nandodurba-ai.github.io en Firebase Authentication → Settings → Authorized domains.");
           return;
         }
 
@@ -312,111 +1017,626 @@ new_block = '''    function getUserProgressRef() {
           return;
         }
 
-        alert("No se pudo iniciar sesión con Google.");
+        alert("No se pudo iniciar sesión con Google. Abrí la consola con F12 para ver el error exacto.");
       }
-    };
+    }
 
-    window.logoutGoogle = async function () {
+    async function logoutGoogle() {
       await signOut(auth);
-    };
+    }
 
-    onAuthStateChanged(auth, async function (user) {
-      const loginScreen = document.getElementById("loginScreen");
-      const app = document.getElementById("app");
-      const userInfo = document.getElementById("userInfo");
-      const userAvatar = document.getElementById("userAvatar");
-      const firebaseWarning = document.getElementById("firebaseWarning");
+    async function loadCloudData() {
+      if (!currentUser) return;
 
-      if (!firebaseReady) {
-        loginScreen.style.display = "none";
-        app.style.display = "block";
-        firebaseWarning.style.display = "block";
-        setSyncStatus("Firebase no configurado");
-        tasks = defaultTasks.map((task, index) => ({
-          id: Date.now() + index,
-          ...task
-        }));
-        inventory = [];
-        renderTasks();
-        renderInventory();
-        updateStats();
+      try {
+        setSyncStatus("Cargando progreso...");
+
+        const snap = await getDoc(getUserProgressRef());
+
+        if (snap.exists()) {
+          const data = snap.data();
+
+          tasks = Array.isArray(data.tasks) ? data.tasks : makeDefaultTasks();
+          inventory = Array.isArray(data.inventory) ? data.inventory : [];
+          $("notes").value = data.notes || "";
+
+          if (tasks.length === 0) {
+            tasks = makeDefaultTasks();
+          }
+        } else {
+          tasks = makeDefaultTasks();
+          inventory = [];
+          $("notes").value = "";
+          await saveCloudData();
+        }
+
+        renderAll();
+        setSyncStatus("Progreso cargado y sincronizado");
+      } catch (error) {
+        console.error("Error cargando Firestore:", error);
+        setSyncStatus("Error al cargar datos");
+        alert("Iniciaste sesión, pero no se pudo cargar Firestore. Revisá que la base de datos exista y que las reglas estén publicadas.");
+      }
+    }
+
+    async function saveCloudData() {
+      if (!currentUser) return;
+
+      try {
+        setSyncStatus("Guardando...");
+
+        await setDoc(getUserProgressRef(), {
+          tasks,
+          inventory,
+          notes: $("notes").value || "",
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        setSyncStatus("Guardado en la nube");
+      } catch (error) {
+        console.error("Error guardando Firestore:", error);
+        setSyncStatus("Error al guardar");
+        alert("No se pudo guardar en Firestore. Revisá las reglas de seguridad.");
+      }
+    }
+
+    function scheduleSaveCloudData() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveCloudData, 500);
+    }
+
+    function openTab(tabId, button) {
+      document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+      document.querySelectorAll(".tabs button").forEach(btn => btn.classList.remove("active"));
+
+      $(tabId).classList.add("active");
+      button.classList.add("active");
+    }
+
+    function setFilter(filter, button) {
+      currentFilter = filter;
+
+      document.querySelectorAll(".filters button").forEach(btn => btn.classList.remove("active"));
+      button.classList.add("active");
+
+      renderTasks();
+    }
+
+    function addTask() {
+      const title = $("taskInput").value.trim();
+      const category = $("categoryInput").value;
+      const priority = $("priorityInput").value;
+
+      if (!title) {
+        alert("Escribí una tarea primero.");
         return;
       }
 
+      tasks.unshift({
+        id: Date.now(),
+        title,
+        category,
+        priority,
+        done: false
+      });
+
+      $("taskInput").value = "";
+
+      scheduleSaveCloudData();
+      renderAll();
+    }
+
+    function toggleTask(id) {
+      tasks = tasks.map(task => {
+        if (task.id === id) {
+          return { ...task, done: !task.done };
+        }
+        return task;
+      });
+
+      scheduleSaveCloudData();
+      renderAll();
+    }
+
+    function deleteTask(id) {
+      if (!confirm("¿Eliminar esta tarea?")) return;
+
+      tasks = tasks.filter(task => task.id !== id);
+
+      scheduleSaveCloudData();
+      renderAll();
+    }
+
+    function getFilteredTasks() {
+      if (currentFilter === "pendientes") return tasks.filter(task => !task.done);
+      if (currentFilter === "alta") return tasks.filter(task => task.priority === "alta" && !task.done);
+      if (currentFilter === "completadas") return tasks.filter(task => task.done);
+      return tasks;
+    }
+
+    function renderTasks() {
+      const taskList = $("taskList");
+      const filtered = getFilteredTasks();
+
+      if (filtered.length === 0) {
+        taskList.innerHTML = `<div class="empty">No hay tareas para mostrar en este filtro.</div>`;
+        return;
+      }
+
+      const categories = [...new Set(filtered.map(task => task.category))];
+
+      let html = "";
+
+      categories.forEach(category => {
+        html += `<div class="section-title">${escapeHtml(category)}</div>`;
+
+        filtered
+          .filter(task => task.category === category)
+          .forEach(task => {
+            html += `
+              <div class="task ${task.done ? "done" : ""}">
+                <input type="checkbox" ${task.done ? "checked" : ""} data-task-toggle="${task.id}" />
+
+                <div>
+                  <div class="task-title">${escapeHtml(task.title)}</div>
+                  <div class="task-meta">
+                    <span class="tag ${task.priority}">Prioridad ${task.priority}</span>
+                    <span>${task.done ? "Completada" : "Pendiente"}</span>
+                  </div>
+                </div>
+
+                <button class="delete-btn" type="button" data-task-delete="${task.id}">×</button>
+              </div>
+            `;
+          });
+      });
+
+      taskList.innerHTML = html;
+
+      document.querySelectorAll("[data-task-toggle]").forEach(input => {
+        input.addEventListener("change", () => toggleTask(Number(input.dataset.taskToggle)));
+      });
+
+      document.querySelectorAll("[data-task-delete]").forEach(button => {
+        button.addEventListener("click", () => deleteTask(Number(button.dataset.taskDelete)));
+      });
+    }
+
+    function updateTodayFocus() {
+      const high = tasks.filter(task => task.priority === "alta" && !task.done);
+      const pending = tasks.filter(task => !task.done);
+
+      if (pending.length === 0) {
+        $("todayFocus").innerHTML = "Excelente. No quedan tareas pendientes cargadas.";
+        return;
+      }
+
+      const focusTasks = high.length > 0 ? high.slice(0, 3) : pending.slice(0, 3);
+
+      $("todayFocus").innerHTML = `
+        <strong>Prioridad sugerida:</strong>
+        <ol>
+          ${focusTasks.map(task => `<li>${escapeHtml(task.title)}</li>`).join("")}
+        </ol>
+      `;
+    }
+
+    function suggestToday() {
+      updateTodayFocus();
+      alert("Te marqué hasta 3 tareas importantes. La idea es no saturarte.");
+    }
+
+    function loadPreset(name, qty, width, depth, height, room) {
+      $("objectName").value = name;
+      $("objectQty").value = qty;
+      $("objectWidth").value = width;
+      $("objectDepth").value = depth;
+      $("objectHeight").value = height;
+      $("objectRoom").value = room;
+      $("objectNotes").value = "";
+    }
+
+    function renderPresetButtons() {
+      $("presetButtons").innerHTML = presets.map((preset, index) => {
+        return `<button type="button" data-preset="${index}">${escapeHtml(preset[0])}</button>`;
+      }).join("");
+
+      document.querySelectorAll("[data-preset]").forEach(button => {
+        button.addEventListener("click", () => {
+          const preset = presets[Number(button.dataset.preset)];
+          loadPreset(...preset);
+        });
+      });
+    }
+
+    function clearObjectForm() {
+      $("objectName").value = "";
+      $("objectQty").value = 1;
+      $("objectWidth").value = "";
+      $("objectDepth").value = "";
+      $("objectHeight").value = "";
+      $("objectRoom").value = "";
+      $("objectNotes").value = "";
+    }
+
+    function addObject() {
+      const name = $("objectName").value.trim();
+      const qty = Number($("objectQty").value);
+      const width = Number($("objectWidth").value);
+      const depth = Number($("objectDepth").value);
+      const height = Number($("objectHeight").value);
+      const room = $("objectRoom").value.trim();
+      const notes = $("objectNotes").value.trim();
+
+      if (!name) {
+        alert("Ingresá el nombre del objeto.");
+        return;
+      }
+
+      if (!qty || qty < 1) {
+        alert("La cantidad debe ser al menos 1.");
+        return;
+      }
+
+      if (!width || !depth || !height) {
+        alert("Completá ancho, profundidad y alto en metros. Ejemplo: 1.40, 0.80, 0.75.");
+        return;
+      }
+
+      inventory.push({
+        id: Date.now(),
+        name,
+        qty,
+        width,
+        depth,
+        height,
+        room,
+        notes
+      });
+
+      clearObjectForm();
+      scheduleSaveCloudData();
+      renderAll();
+    }
+
+    function deleteObject(id) {
+      if (!confirm("¿Eliminar este objeto del inventario?")) return;
+
+      inventory = inventory.filter(item => item.id !== id);
+
+      scheduleSaveCloudData();
+      renderAll();
+    }
+
+    function renderInventory() {
+      const empty = $("inventoryEmpty");
+      const tableWrap = $("inventoryTableWrap");
+      const body = $("inventoryBody");
+
+      if (inventory.length === 0) {
+        empty.style.display = "block";
+        tableWrap.style.display = "none";
+        body.innerHTML = "";
+        return;
+      }
+
+      empty.style.display = "none";
+      tableWrap.style.display = "block";
+
+      body.innerHTML = inventory.map(item => {
+        const area = item.width * item.depth * item.qty;
+        const volume = item.width * item.depth * item.height * item.qty;
+
+        return `
+          <tr>
+            <td><strong>${escapeHtml(item.name)}</strong></td>
+            <td>${item.qty}</td>
+            <td>${item.width.toFixed(2)} m</td>
+            <td>${item.depth.toFixed(2)} m</td>
+            <td>${item.height.toFixed(2)} m</td>
+            <td>${area.toFixed(2)} m²</td>
+            <td><span class="pill">${volume.toFixed(2)} m³</span></td>
+            <td><span class="room-badge">${escapeHtml(item.room || "Sin indicar")}</span></td>
+            <td>${escapeHtml(item.notes || "-")}</td>
+            <td><button class="delete-btn" type="button" data-object-delete="${item.id}">×</button></td>
+          </tr>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-object-delete]").forEach(button => {
+        button.addEventListener("click", () => deleteObject(Number(button.dataset.objectDelete)));
+      });
+    }
+
+    function getInventorySummary() {
+      let units = 0;
+      let area = 0;
+      let volume = 0;
+
+      inventory.forEach(item => {
+        units += item.qty;
+        area += item.width * item.depth * item.qty;
+        volume += item.width * item.depth * item.height * item.qty;
+      });
+
+      return {
+        objects: inventory.length,
+        units,
+        area,
+        volume,
+        volumeMargin: volume * 1.2
+      };
+    }
+
+    function updateInventorySummary() {
+      const summary = getInventorySummary();
+
+      $("summaryObjects").textContent = summary.objects;
+      $("summaryUnits").textContent = summary.units;
+      $("summaryArea").textContent = summary.area.toFixed(2) + " m²";
+      $("summaryVolume").textContent = summary.volume.toFixed(2) + " m³";
+      $("summaryVolumeMargin").textContent = summary.volumeMargin.toFixed(2) + " m³";
+    }
+
+    function updateStats() {
+      const total = tasks.length;
+      const done = tasks.filter(task => task.done).length;
+      const progress = total === 0 ? 0 : Math.round((done / total) * 100);
+      const invSummary = getInventorySummary();
+
+      $("totalTasks").textContent = total;
+      $("doneTasks").textContent = done;
+      $("totalObjects").textContent = inventory.length;
+      $("totalVolume").textContent = invSummary.volume.toFixed(2) + " m³";
+      $("progressText").textContent = progress + "%";
+      $("progressBar").style.width = progress + "%";
+
+      updateTodayFocus();
+      updateInventorySummary();
+    }
+
+    function renderAll() {
+      renderTasks();
+      renderInventory();
+      updateStats();
+    }
+
+    function buildInventoryText() {
+      if (inventory.length === 0) return "";
+
+      const summary = getInventorySummary();
+
+      let text = "INVENTARIO PARA MUDANZA\n\n";
+
+      inventory.forEach(item => {
+        const volume = item.width * item.depth * item.height * item.qty;
+
+        text += `- ${item.name} x${item.qty}`;
+        text += ` | ${item.width.toFixed(2)} x ${item.depth.toFixed(2)} x ${item.height.toFixed(2)} m`;
+        text += ` | ${volume.toFixed(2)} m³`;
+        text += item.room ? ` | ${item.room}` : "";
+        text += item.notes ? ` | Obs: ${item.notes}` : "";
+        text += "\n";
+      });
+
+      text += "\nRESUMEN\n";
+      text += `Objetos cargados: ${summary.objects}\n`;
+      text += `Bultos/unidades: ${summary.units}\n`;
+      text += `Superficie base aprox.: ${summary.area.toFixed(2)} m²\n`;
+      text += `Volumen aprox.: ${summary.volume.toFixed(2)} m³\n`;
+      text += `Volumen con margen 20%: ${summary.volumeMargin.toFixed(2)} m³\n`;
+
+      return text;
+    }
+
+    function buildFullSummary() {
+      const pending = tasks.filter(task => !task.done);
+      const done = tasks.filter(task => task.done);
+      const notes = $("notes").value.trim();
+      const inventoryText = buildInventoryText();
+
+      let summary = "RESUMEN COMPLETO DE MUDANZA\n\n";
+
+      summary += "TAREAS PENDIENTES:\n";
+      if (pending.length === 0) {
+        summary += "- Sin pendientes.\n";
+      } else {
+        pending.forEach(task => {
+          summary += `- [${task.priority.toUpperCase()}] ${task.title} (${task.category})\n`;
+        });
+      }
+
+      summary += "\nTAREAS COMPLETADAS:\n";
+      if (done.length === 0) {
+        summary += "- Todavía no hay tareas completadas.\n";
+      } else {
+        done.forEach(task => {
+          summary += `- ${task.title}\n`;
+        });
+      }
+
+      if (inventoryText) {
+        summary += "\n" + inventoryText + "\n";
+      }
+
+      if (notes) {
+        summary += "\nNOTAS:\n" + notes + "\n";
+      }
+
+      return summary;
+    }
+
+    function downloadInventoryCSV() {
+      if (inventory.length === 0) {
+        alert("No hay objetos cargados para descargar.");
+        return;
+      }
+
+      const summary = getInventorySummary();
+
+      let csv = "Objeto,Cantidad,Ancho m,Profundidad m,Alto m,Superficie base m2,Volumen m3,Ambiente,Observaciones\n";
+
+      inventory.forEach(item => {
+        const area = item.width * item.depth * item.qty;
+        const volume = item.width * item.depth * item.height * item.qty;
+
+        csv += [
+          cleanCsv(item.name),
+          item.qty,
+          item.width.toFixed(2),
+          item.depth.toFixed(2),
+          item.height.toFixed(2),
+          area.toFixed(2),
+          volume.toFixed(2),
+          cleanCsv(item.room || ""),
+          cleanCsv(item.notes || "")
+        ].join(",") + "\n";
+      });
+
+      csv += "\n";
+      csv += "Resumen,,,,,,,,\n";
+      csv += `Objetos cargados,${summary.objects},,,,,,,\n`;
+      csv += `Cantidad total de bultos,${summary.units},,,,,,,\n`;
+      csv += `Superficie base total m2,${summary.area.toFixed(2)},,,,,,,\n`;
+      csv += `Volumen total m3,${summary.volume.toFixed(2)},,,,,,,\n`;
+      csv += `Volumen con margen 20%,${summary.volumeMargin.toFixed(2)},,,,,,,\n`;
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "inventario_mudanza.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(url);
+    }
+
+    async function copyText(text, message) {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert(message);
+      } catch {
+        alert("No se pudo copiar automáticamente.");
+      }
+    }
+
+    function copyInventorySummary() {
+      const text = buildInventoryText();
+      if (!text) {
+        alert("No hay inventario cargado.");
+        return;
+      }
+
+      copyText(text, "Resumen de inventario copiado.");
+    }
+
+    function shareInventoryWhatsApp() {
+      const text = buildInventoryText();
+      if (!text) {
+        alert("No hay inventario cargado.");
+        return;
+      }
+
+      window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+    }
+
+    function copyFullSummary() {
+      copyText(buildFullSummary(), "Resumen completo copiado.");
+    }
+
+    function shareFullWhatsApp() {
+      window.open("https://wa.me/?text=" + encodeURIComponent(buildFullSummary()), "_blank");
+    }
+
+    function saveNotes() {
+      saveCloudData();
+      alert("Notas guardadas en tu cuenta.");
+    }
+
+    function resetInventory() {
+      if (!confirm("¿Borrar todo el inventario de objetos?")) return;
+
+      inventory = [];
+      scheduleSaveCloudData();
+      renderAll();
+    }
+
+    function resetAll() {
+      if (!confirm("Esto borrará tareas, inventario y notas. ¿Seguro?")) return;
+
+      tasks = makeDefaultTasks();
+      inventory = [];
+      $("notes").value = "";
+
+      scheduleSaveCloudData();
+      renderAll();
+    }
+
+    function bindEvents() {
+      $("loginBtn").addEventListener("click", loginWithGoogle);
+      $("logoutBtn").addEventListener("click", logoutGoogle);
+
+      document.querySelectorAll(".tabs button").forEach(button => {
+        button.addEventListener("click", () => openTab(button.dataset.tab, button));
+      });
+
+      document.querySelectorAll(".filters button").forEach(button => {
+        button.addEventListener("click", () => setFilter(button.dataset.filter, button));
+      });
+
+      $("addTaskBtn").addEventListener("click", addTask);
+      $("taskInput").addEventListener("keydown", event => {
+        if (event.key === "Enter") addTask();
+      });
+
+      $("suggestTodayBtn").addEventListener("click", suggestToday);
+
+      $("addObjectBtn").addEventListener("click", addObject);
+      $("clearObjectBtn").addEventListener("click", clearObjectForm);
+
+      $("downloadCsvBtn").addEventListener("click", downloadInventoryCSV);
+      $("copyInventoryBtn").addEventListener("click", copyInventorySummary);
+      $("shareInventoryBtn").addEventListener("click", shareInventoryWhatsApp);
+      $("resetInventoryBtn").addEventListener("click", resetInventory);
+
+      $("saveNotesBtn").addEventListener("click", saveNotes);
+      $("copyFullBtn").addEventListener("click", copyFullSummary);
+      $("shareFullBtn").addEventListener("click", shareFullWhatsApp);
+      $("resetAllBtn").addEventListener("click", resetAll);
+
+      $("notes").addEventListener("input", scheduleSaveCloudData);
+
+      renderPresetButtons();
+    }
+
+    onAuthStateChanged(auth, async function(user) {
       if (user) {
         currentUser = user;
 
-        loginScreen.style.display = "none";
-        app.style.display = "block";
-        firebaseWarning.style.display = "none";
+        $("loginScreen").style.display = "none";
+        $("app").style.display = "block";
 
-        userInfo.textContent = user.displayName || user.email || "Usuario";
-        userAvatar.src = user.photoURL || "";
-        userAvatar.style.display = user.photoURL ? "block" : "none";
+        $("userInfo").textContent = user.displayName || user.email || "Usuario";
+
+        if (user.photoURL) {
+          $("userAvatar").src = user.photoURL;
+          $("userAvatar").style.display = "block";
+        } else {
+          $("userAvatar").style.display = "none";
+        }
 
         await loadCloudData();
-        renderTasks();
-        renderInventory();
-        updateStats();
       } else {
         currentUser = null;
-
-        loginScreen.style.display = "grid";
-        app.style.display = "none";
+        $("loginScreen").style.display = "grid";
+        $("app").style.display = "none";
       }
-    });'''
-html = html.replace(old_block, new_block)
-
-# 5) Replace save calls
-html = html.replace("      saveTasks();", "      scheduleSaveCloudData();")
-html = html.replace("      saveInventory();", "      scheduleSaveCloudData();")
-
-# Some initial save in loadCloudData was in new block saveCloudData not schedule now OK? We already replaced inside new block? Let's inspect fix if saveCloudData got replaced accidentally:
-html = html.replace("await scheduleSaveCloudData();", "await saveCloudData();")
-
-# 6) localStorage remove in resetAll/resetInventory should not be necessary but original has removals. Remove them.
-html = html.replace('      localStorage.removeItem("mudanzaTasks");\n      localStorage.removeItem("mudanzaNotes");\n      localStorage.removeItem("mudanzaInventory");\n\n', '')
-
-# 7) notes input event localStorage -> scheduleSave
-old_notes_listener = '''    document.getElementById("notes").addEventListener("input", function() {
-      localStorage.setItem("mudanzaNotes", this.value);
     });
 
-    loadData();'''
-new_notes_listener = '''    document.getElementById("notes").addEventListener("input", function() {
-      scheduleSaveCloudData();
-    });
-
-    /*
-      Como este script es type="module", las funciones llamadas desde onclick=""
-      deben exponerse en window.
-    */
-    window.openTab = openTab;
-    window.addTask = addTask;
-    window.toggleTask = toggleTask;
-    window.deleteTask = deleteTask;
-    window.setFilter = setFilter;
-    window.suggestToday = suggestToday;
-    window.loadPreset = loadPreset;
-    window.clearObjectForm = clearObjectForm;
-    window.addObject = addObject;
-    window.deleteObject = deleteObject;
-    window.downloadInventoryCSV = downloadInventoryCSV;
-    window.copyInventorySummary = copyInventorySummary;
-    window.shareInventoryWhatsApp = shareInventoryWhatsApp;
-    window.saveNotes = saveNotes;
-    window.copyFullSummary = copyFullSummary;
-    window.shareFullWhatsApp = shareFullWhatsApp;
-    window.resetInventory = resetInventory;
-    window.resetAll = resetAll;'''
-html = html.replace(old_notes_listener, new_notes_listener)
-
-# 8) Save might occur on resetAll and resetInventory with schedule not immediate. Good.
-# But saveCloudData should happen immediately on destructive reset? schedule okay, but maybe alert not. fine.
-
-# 9) Need openTab exposed before onclick? module loaded after HTML, okay.
-
-# write file
-out_path = Path("/mnt/data/index_organizador_mudanza_firebase.html")
-out_path.write_text(html, encoding="utf-8")
-out_path.as_posix()
+    bindEvents();
+  </script>
+</body>
+</html>
